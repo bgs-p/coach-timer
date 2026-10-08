@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101115" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Coach Timer" />
+  <meta name="description" content="A free local coaching timer for intervals, time caps, and simulation laps." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Coach Timer</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Coach Timer home">
+        <span class="brand-mark">CT</span>
+        <span><strong>Coach Timer</strong><small>Intervals, caps, laps</small></span>
+      </a>
+      <select id="savedWorkouts" aria-label="Saved interval workouts">
+        <option value="">Saved workouts</option>
+      </select>
+    </header>
+
+    <section class="timer-panel" id="top" aria-label="Timer">
+      <div class="timer-meta">
+        <span id="modeLabel">INTERVAL SESSION</span>
+        <span id="statusLabel">READY</span>
+      </div>
+      <div class="timer-context">
+        <span id="primaryLabel">Build a session</span>
+        <span id="secondaryLabel">-</span>
+      </div>
+      <div id="noteLabel" class="note">Pick a mode and press start.</div>
+      <div id="timeDisplay" class="time-display" role="timer" aria-live="off">00:00.0</div>
+      <div class="progress-track" aria-label="Timer progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="progressBar"></div>
+      </div>
+      <div class="controls">
+        <button id="startBtn" class="button button-primary" type="button">Start</button>
+        <button id="pauseBtn" class="button button-secondary" type="button">Pause</button>
+        <button id="resetBtn" class="button button-quiet" type="button">Reset</button>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Timer modes">
+      <button class="tab is-active" type="button" data-mode="interval">Intervals</button>
+      <button class="tab" type="button" data-mode="cap">Time Cap</button>
+      <button class="tab" type="button" data-mode="simulation">Simulation</button>
+    </nav>
+
+    <section class="panel" id="intervalPanel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Rounds and sets</span>
+          <h1>Interval timer</h1>
+        </div>
+        <button id="saveWorkoutBtn" class="button button-outline" type="button">Save</button>
+      </div>
+      <label class="field field-wide">
+        <span>Workout name</span>
+        <input id="workoutName" type="text" value="Coaching intervals" maxlength="48" />
+      </label>
+      <div class="grid">
+        <label class="field"><span>Rounds</span><input id="roundsInput" type="number" min="1" max="99" value="4" inputmode="numeric" /></label>
+        <label class="field"><span>Sets / round</span><input id="setsInput" type="number" min="1" max="99" value="3" inputmode="numeric" /></label>
+        <label class="field"><span>Work sec</span><input id="workInput" type="number" min="1" max="5999" value="40" inputmode="numeric" /></label>
+        <label class="field"><span>Rest / set sec</span><input id="setRestInput" type="number" min="0" max="5999" value="20" inputmode="numeric" /></label>
+        <label class="field"><span>Rest / round sec</span><input id="roundRestInput" type="number" min="0" max="5999" value="60" inputmode="numeric" /></label>
+      </div>
+      <div class="action-row">
+        <button id="buildIntervalsBtn" class="button button-primary" type="button">Build</button>
+        <button id="deleteWorkoutBtn" class="button button-quiet" type="button">Delete Saved</button>
+      </div>
+    </section>
+
+    <section class="panel is-hidden" id="capPanel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Single countdown</span>
+          <h1>Time cap</h1>
+        </div>
+      </div>
+      <div class="cap-row">
+        <label class="field"><span>Minutes</span><input id="capMinutes" type="number" min="0" max="599" value="12" inputmode="numeric" /></label>
+        <label class="field"><span>Seconds</span><input id="capSeconds" type="number" min="0" max="59" value="0" inputmode="numeric" /></label>
+      </div>
+      <button id="setCapBtn" class="button button-primary" type="button">Set Time Cap</button>
+    </section>
+
+    <section class="panel is-hidden" id="simulationPanel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Flexible roster</span>
+          <h1>Simulation laps</h1>
+        </div>
+        <div class="button-pair">
+          <button id="exportSimulationBtn" class="button button-outline" type="button">Export CSV</button>
+          <button id="saveSimulationBtn" class="button button-outline" type="button">Save Laps</button>
+        </div>
+      </div>
+      <div class="wave-tools">
+        <label class="field">
+          <span>Wave name</span>
+          <input id="waveName" type="text" value="Wave 1" maxlength="24" />
+        </label>
+        <button id="addWaveBtn" class="button button-primary" type="button">Add Wave</button>
+        <label class="field">
+          <span>Start wave</span>
+          <select id="activeWave" aria-label="Wave to start"></select>
+        </label>
+        <button id="startWaveBtn" class="button button-secondary" type="button">Start Wave</button>
+        <button id="deleteWaveBtn" class="button button-quiet" type="button">Delete Wave</button>
+      </div>
+      <div id="waveList" class="wave-list"></div>
+      <div class="sim-tools">
+        <label class="field">
+          <span>People</span>
+          <input id="personCount" type="number" min="1" value="4" inputmode="numeric" />
+        </label>
+        <button id="applyPeopleBtn" class="button button-primary" type="button">Apply</button>
+        <button id="clearLapsBtn" class="button button-quiet" type="button">Clear</button>
+        <button id="clearPeopleBtn" class="button button-quiet" type="button">Clear People</button>
+      </div>
+      <div id="peopleList" class="people-list"></div>
+    </section>
+
+    <section class="panel details-panel">
+      <div class="panel-heading compact">
+        <div>
+          <span class="eyebrow">Details</span>
+          <h2 id="detailsTitle">Session plan</h2>
+        </div>
+        <span id="detailsSummary" class="summary"></span>
+      </div>
+      <ol id="intervalList" class="interval-list">
+        <li class="empty">Build a workout to see every work and rest block.</li>
+      </ol>
+      <div id="savedSimulations" class="saved-sims"></div>
+    </section>
+
+    <footer class="footer">All saved data stays on this device. Use Safari Share -> Add to Home Screen for iPhone.</footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
